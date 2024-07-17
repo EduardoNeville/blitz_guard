@@ -21,6 +21,7 @@ const KEY: [u8; 32] = [0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
     0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
     0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef,
     0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef];
+
 const NONCE: [u8; 12] = [0; 12];  // Using a constant nonce for simplicity; in a real application, each nonce should be unique
 
 fn encrypt(data: &[u8]) -> Result<Vec<u8>, String> {
@@ -100,6 +101,7 @@ fn setup_tun_interface() -> Result<(), Box<dyn Error>> {
         .arg("delete")
         .arg("tun0")
         .output();
+
     let output = Command::new("sudo")
         .arg("ip")
         .arg("link")
@@ -108,9 +110,11 @@ fn setup_tun_interface() -> Result<(), Box<dyn Error>> {
         .arg("tun0")
         .arg("up")
         .output()?;
+
     if !output.status.success() {
         return Err(format!("Failed to bring up tun0: {:?}", output.stderr).into());
     }
+
     let output = Command::new("sudo")
         .arg("ip")
         .arg("addr")
@@ -119,6 +123,7 @@ fn setup_tun_interface() -> Result<(), Box<dyn Error>> {
         .arg("dev")
         .arg("tun0")
         .output()?;
+
     if !output.status.success() {
         return Err(format!("Failed to assign IP to tun0: {:?}", output.stderr).into());
     }
@@ -169,7 +174,6 @@ fn handle_client(client_id: usize, mut stream: TcpStream, clients: Arc<Mutex<Has
 }
 
 fn server_mode() {
-
     let listener = TcpListener::bind("0.0.0.0:12345").unwrap();
     let clients: Arc<Mutex<HashMap<usize, TcpStream>>> = Arc::new(Mutex::new(HashMap::new()));
 
@@ -246,6 +250,7 @@ fn read_from_tun_and_send_to_client<T: tun::Device>(tun: &mut T, mut client: Tcp
         match tun.read(&mut buffer) {
             Ok(n) => {
                 match encrypt(&buffer[..n]) {
+
                     Ok(encrypted_data) => {
                         // Handle sending the encrypted data to the client
                         info!("Received {} bytes from TUN device.", n);
@@ -256,8 +261,10 @@ fn read_from_tun_and_send_to_client<T: tun::Device>(tun: &mut T, mut client: Tcp
                             error!("Error writing to client: {}", e);
                             break;
                         }
+
                         info!("Forwarded {} bytes to destination.", n);
                     },
+
                     Err(err_msg) => {
                         // Handle the encryption error
                         error!("Encryption error: {}", err_msg);
@@ -295,7 +302,6 @@ async fn read_from_client_and_write_to_tun(client: &mut TcpStream, tun: &mut Dev
 }
 
 async fn client_mode(vpn_server_ip: &str) {
-
     // Basic client mode for demonstration
     let mut stream = TcpStream::connect(vpn_server_ip).unwrap();
 
