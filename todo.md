@@ -2,13 +2,14 @@ TODO list:
 
 For next week:
 
-- Fix issues with client-server for Linux
-- Read about different tunneling mechanisms
-- Proper encryption without the KEY line 14
+- [X] Fix issues with client-server for Linux
+- [ ] Read about different tunneling mechanisms
+- [ ] Proper encryption without the KEY line 14
 
 Things to think about:
-- Modularisation
-- Simplicity
+- [X] Modularisation
+- [ ] Simplicity
+- [ ] Privatization of functions and variables
 
 ## Future goals:
 
